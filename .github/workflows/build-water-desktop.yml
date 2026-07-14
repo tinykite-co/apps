@@ -27,6 +27,8 @@ jobs:
         with:
           repository: tinykite-co/monorepo
           token: ${{ secrets.MONOREPO_ACCESS_TOKEN }}
+          ref: feat/passkey-captcha-hub
+          path: .
 
       - name: Install Node.js
         uses: actions/setup-node@v4

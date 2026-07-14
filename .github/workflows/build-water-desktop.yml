@@ -1,0 +1,50 @@
+name: Build Desktop Apps (macOS & Windows)
+
+on:
+  push:
+    tags:
+      - 'water-v*' # Trigger on tag push (e.g., water-v1.0.0)
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [macos-latest, windows-latest]
+        include:
+          - platform: macos-latest
+            os: macos
+            arch: universal
+          - platform: windows-latest
+            os: windows
+            arch: x86_64
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+      - name: Checkout Private Monorepo
+        uses: actions/checkout@v4
+        with:
+          repository: tinykite-co/monorepo
+          token: ${{ secrets.MONOREPO_ACCESS_TOKEN }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build Tauri App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: ./CompanionApp/Desktop
+          tagName: ${{ github.ref_name }} # Release tag
+          releaseName: 'TinyKite Water ${{ github.ref_name }}'
+          releaseBody: 'See the assets below to download and install this version.'
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.platform == 'macos-latest' && '--target universal-apple-darwin' || '' }}

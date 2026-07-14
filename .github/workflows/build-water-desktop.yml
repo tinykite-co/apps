@@ -37,7 +37,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
         working-directory: ./tiny-kite-reminders
 
       - name: Build Tauri App
